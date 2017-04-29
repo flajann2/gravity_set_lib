@@ -1,4 +1,6 @@
 * Mitchell Gravity Set
+** Synopsis
+   This library generates the Gravity Set, 
 ** Background
 ** Why this is just a library
 ** Contributing

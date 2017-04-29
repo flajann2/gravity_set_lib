@@ -5,4 +5,3 @@ authors = ["Fred Mitchell <fred.mitchell@gmx.de>"]
 
 [dependencies]
 serde_json = "1.0.1"
-ndarray = "0.9.1"
