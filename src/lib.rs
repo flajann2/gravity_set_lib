@@ -1,14 +1,24 @@
 #[cfg(test)]
 
+extern crate serde;
 extern crate serde_json;
 extern crate ndarray;
 
+#[macro_use]
+extern crate serde_derive;
+
+use serde_json::Error;
+use std::thread;
 use ndarray::Array;
 use ndarray::Array2;
 use ndarray::Array3;
 use ndarray::Dim;
 
 mod gravity_set {
+    /// 2D and 3D coords
+    type TwoD   = [f64;2];
+    type ThreeD = [f64;3];
+
     /// 2- and 3-dimensional GS
     pub trait Coord {}
 
@@ -18,6 +28,7 @@ mod gravity_set {
     /// T is a 2 or 3-element array of f64 defining
     /// the coordinates of the star.
     #[derive(Debug)]
+    #[derive(Serialize, Deserialize)]
     pub struct Star<T: Coord> {
         mass: f64,
         coordinate: T
@@ -32,13 +43,13 @@ mod gravity_set {
     
     #[test]
     fn star_is_working() {
-        type A = [f64;3];
-        let s = Star::<A> { mass: 100.0, coordinate: [1.1, 2.2, 3.3]};
+        let s = Star::<ThreeD> { mass: 100.0, coordinate: [1.1, 2.2, 3.3]};
     }
 
     /// Total description of the
     /// gravitational system.
     #[derive(Debug)]
+    #[derive(Serialize, Deserialize)]
     pub struct GSystem<T: Coord> {
         stars: Vec<Star<T>>,
         asize: u32,
@@ -61,14 +72,26 @@ mod gravity_set {
                            ucorner: upper }
         }
     }
+
+    type GSystem2 = GSystem<TwoD>;
+    type GSystem3 = GSystem<ThreeD>;
     
     #[test]
     fn gsystem_is_working() {
-        type A = [f64;3];
-        type S = Star<A>;
+        type S = Star<ThreeD>;
         let mut vs = Vec::<S>::new();
         vs.push(S::new(1.0, [2.0, 3.1, -1.0]));
         println!("vec: {:?}", vs);
         let gs = GSystem::<A>::new(vs, 8, 0.1, [0.,0.,0.], [1.,1.,1.]);
+        assert!(gs);
     }
+
+    /// Initialize 
+    #[no_mangle]
+    pub extern fn init_gs2(json: String) -> *mut GSystem2 {
+        let mut vs = Vec::<Star<TwoD>>::new();
+        let mut gs = GSystem2::new(vs, 8, 0.1, [0.,0.], [1.,1.]);
+        &mut gs
+    }
+    
 }
