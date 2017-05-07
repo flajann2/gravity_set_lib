@@ -1,20 +1,25 @@
+#![feature(question_mark_carrier)]
 #[cfg(test)]
 
 extern crate serde;
+#[macro_use]
 extern crate serde_json;
+
 extern crate ndarray;
 
 #[macro_use]
 extern crate serde_derive;
 
-use serde_json::Error;
-use std::thread;
-use ndarray::Array;
-use ndarray::Array2;
-use ndarray::Array3;
-use ndarray::Dim;
-
 mod gravity_set {
+    use serde_json::from_str;
+    use std::thread;
+    use std::ops::Carrier;
+    use std::result::Result;
+    use ndarray::Array;
+    use ndarray::Array2;
+    use ndarray::Array3;
+    use ndarray::Dim;
+
     /// 2D and 3D coords
     type TwoD   = [f64;2];
     type ThreeD = [f64;3];
@@ -57,8 +62,7 @@ mod gravity_set {
         lcorner: T,
         ucorner: T
     }
-
-
+    
     impl <T: Coord> GSystem<T> {
         pub fn new(stars: Vec<Star<T>>,
                    msize: u32,
@@ -73,6 +77,14 @@ mod gravity_set {
         }
     }
 
+    impl <T: Coord> Carrier for GSystem<T> {
+        type Success = Ok;
+        type Error = Err;
+        fn from_success(&self) -> Self { self }
+        fn from_error(&self) -> Self { self }
+        fn translate<N>(self) -> N {}
+    }
+    
     type GSystem2 = GSystem<TwoD>;
     type GSystem3 = GSystem<ThreeD>;
     
@@ -88,9 +100,8 @@ mod gravity_set {
 
     /// Initialize 
     #[no_mangle]
-    pub extern fn init_gs2(json: String) -> *mut GSystem2 {
-        let mut vs = Vec::<Star<TwoD>>::new();
-        let mut gs = GSystem2::new(vs, 8, 0.1, [0.,0.], [1.,1.]);
+    pub extern fn init_gs2(json: &str) -> *mut GSystem2 {
+        let mut gs: GSystem2 = from_str(json)?;
         &mut gs
     }
     
