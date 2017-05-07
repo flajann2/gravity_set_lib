@@ -7,7 +7,7 @@ extern crate ndarray;
 #[macro_use]
 extern crate serde_derive;
 
-mod gravity_set {
+pub mod gravity_set {
     use serde_json::from_str;
     use serde_json::Error;
     use std::thread;
@@ -87,10 +87,17 @@ mod gravity_set {
         assert!(gs);
     }
 
-    /// Initialize 
+    /// Run 2D
     #[no_mangle]
-    pub extern "C" fn init_gs2(json: &str) -> Result<GSystem2, Error> {
+    pub extern fn run_gs2(json: &str) -> Result<GSystem2, Error> {
         let gs: GSystem2 = from_str(json)?;
+        Ok(gs)
+    }   
+
+    /// Run 3D
+    #[no_mangle]
+    pub extern fn run_gs3(json: &str) -> Result<GSystem3, Error> {
+        let gs: GSystem3 = from_str(json)?;
         Ok(gs)
     }   
 }
