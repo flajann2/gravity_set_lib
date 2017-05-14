@@ -52,6 +52,7 @@ pub struct GSystem<T: Coord> {
     stars: Vec<Star<T>>,
     asize: u32,
     delta: f64,
+    max_iter: u32,
     lcorner: T,
     ucorner: T
 }
@@ -60,13 +61,20 @@ impl <T: Coord> GSystem<T> {
     pub fn new(stars: Vec<Star<T>>,
                msize: u32,
                delta: f64,
+               miter: u32,
                upper: T,
                lower: T) -> GSystem<T> {
         GSystem::<T> { stars: stars,
                        asize: 2u32.pow(msize),
                        delta: delta,
+                       max_iter: miter,
                        lcorner: lower,
                        ucorner: upper }
+    }
+    
+    /// This iterates for a single point
+    pub fn iterate(initial: T) -> u32 {
+        0
     }
 }
 
