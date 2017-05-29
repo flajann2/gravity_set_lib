@@ -20,8 +20,8 @@ type ThreeD = [f64;3];
 
 /// 2- and 3-dimensional GS
 pub trait Coord {}
-impl Coord for [f64;2] {}
-impl Coord for [f64;3] {}
+impl Coord for TwoD {}
+impl Coord for ThreeD {}
 
 /// T is a 2 or 3-element array of f64 defining
 /// the coordinates of the star.
@@ -41,7 +41,8 @@ impl <T: Coord> Star<T> {
 
 #[test]
 fn star_is_working() {
-    let s = Star::<ThreeD> { mass: 100.0, coordinate: [1.1, 2.2, 3.3]};
+    let s = Star::<ThreeD> { mass: 100.0,
+                             coordinate: [1.1, 2.2, 3.3]};
 }
 
 /// Total description of the
@@ -76,6 +77,20 @@ impl <T: Coord> GSystem<T> {
     pub fn iterate(initial: T) -> u32 {
         0
     }
+
+    fn center_of_mass(&self) -> T {
+        let mut total_mass: f64 = 0.0;
+        let mut saccum: T;
+        match saccum {
+            TwoD => [0.0, 0.0],
+            ThreeD => [0.0, 0.0, 0.0],
+        }
+        for star in &self.stars {
+            total_mass += star.mass;
+            
+        }
+        saccum
+    }
 }
 
 type GSystem2 = GSystem<TwoD>;
@@ -87,15 +102,22 @@ fn gsystem_is_working() {
     let mut vs = Vec::<S>::new();
     vs.push(S::new(1.0, [2.0, 3.1, -1.0]));
     println!("vec: {:?}", vs);
-    let gs = GSystem::<A>::new(vs, 8, 0.1, [0.,0.,0.], [1.,1.,1.]);
-    assert!(gs);
+    let gs = GSystem3::new(vs,
+                           8,
+                           0.1,
+                           256,
+                           [0.,0.,0.],
+                           [1.,1.,1.]);
+    assert_eq!(gs.max_iter, 256);
 }
+
 // Run 2D
 #[no_mangle]
 pub extern fn run_gs2(json: &str) -> Result<GSystem2, Error> {
     let gs: GSystem2 = from_str(json)?;
     Ok(gs)
-}   
+}
+
 // Run 3D
 #[no_mangle]
 pub extern fn run_gs3(json: &str) -> Result<GSystem3, Error> {

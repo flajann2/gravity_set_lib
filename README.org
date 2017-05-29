@@ -4,4 +4,3 @@
 ** Background
 ** Why this is just a library
 ** Contributing
-

@@ -2,7 +2,7 @@
 
 use ::{GSystem, Coord};
 
-fn field<T, F>(gs: GSystem<T>, upper: T, lower: T) -> F
-    where T: Coord {
-    
-}
+// fn field<T, F>(gs: GSystem<T>, upper: T, lower: T) -> F
+//     where T: Coord {
+//     let F
+// }
