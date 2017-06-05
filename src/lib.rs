@@ -15,9 +15,41 @@ use ndarray::{Array, Array2, Array3, Dim};
 mod compute;
 
 /// 2D and 3D coords
-type TwoD   = [f64;2];
-type ThreeD = [f64;3];
+// type TwoD   = [f64;2];
+// type ThreeD = [f64;3];
 
+pub struct TwoD{
+    x: f64,
+    y: f64
+}
+
+impl TwoD {
+    pub fn new(x: f64, y: f64) -> TwoD {
+        TwoD { x: x, y: y }
+    }
+
+    pub fn zeros() -> TwoD {
+        TwoD { x: 0., y: 0. }
+    }
+}
+
+pub struct ThreeD {
+    x: f64,
+    y: f64,
+    z: f64
+}
+
+impl ThreeD {
+    pub fn new(x: f64, y: f64, z: f64) -> ThreeD {
+        ThreeD {x: x, y: y, z: z }
+    }
+
+    pub fn zeros() -> ThreeD {
+        ThreeD { x: 0., y: 0., z: 0. }
+    }
+
+}
+       
 /// 2- and 3-dimensional GS
 pub trait Coord {}
 impl Coord for TwoD {}
@@ -42,7 +74,7 @@ impl <T: Coord> Star<T> {
 #[test]
 fn star_is_working() {
     let s = Star::<ThreeD> { mass: 100.0,
-                             coordinate: [1.1, 2.2, 3.3]};
+                             coordinate: ThreeD {x: 1.1, y: 2.2, z: 3.3}};
 }
 
 /// Total description of the
@@ -80,11 +112,7 @@ impl <T: Coord> GSystem<T> {
 
     fn center_of_mass(&self) -> T {
         let mut total_mass: f64 = 0.0;
-        let mut saccum: T;
-        match saccum {
-            TwoD => [0.0, 0.0],
-            ThreeD => [0.0, 0.0, 0.0],
-        }
+        let mut saccum: T = T.zeros();
         for star in &self.stars {
             total_mass += star.mass;
             
