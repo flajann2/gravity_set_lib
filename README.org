@@ -2,6 +2,7 @@
 ** Synopsis
    This library generates the Gravity Set, 
 ** Background
+*** Motivation
    The original MGS was implemented as a 2D gravity field.
    As well, at the time, the computing power of the computers
    at the time were limited, and generating a 3D field would've
@@ -12,6 +13,11 @@
    terrority here, as I do not know what to exepct. But
    it makes more sense anyway, since real gravity operates 
    in 3D space, in the classical Newtonian sense.   
+
+   Besides, today we have very impressive 3D fractals rendered
+   by others, and I am not willing to be "left out" of the
+   fun! This will also be a serious chance to make use of the
+   OpenGL library for rendering the results.
 
 ** Why this is just a library
 ** Contributing

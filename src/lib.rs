@@ -14,141 +14,107 @@ use ndarray::{Array, Array2, Array3, Dim};
 
 mod compute;
 
-/// 2D and 3D coords
-// type TwoD   = [f64;2];
-// type ThreeD = [f64;3];
 
-pub struct TwoD{
-    x: f64,
-    y: f64
-}
-
-impl TwoD {
-    pub fn new(x: f64, y: f64) -> TwoD {
-        TwoD { x: x, y: y }
-    }
-
-    pub fn zeros() -> TwoD {
-        TwoD { x: 0., y: 0. }
-    }
-}
-
-pub struct ThreeD {
+/// Mainly for the fixed coordinates of the Stars
+pub struct Coord {
     x: f64,
     y: f64,
     z: f64
 }
 
-impl ThreeD {
-    pub fn new(x: f64, y: f64, z: f64) -> ThreeD {
-        ThreeD {x: x, y: y, z: z }
+impl Coord {
+    fn zeros() -> Coord {
+        Coord {x: 0.0, y: 0.0, z: 0.0}
     }
-
-    pub fn zeros() -> ThreeD {
-        ThreeD { x: 0., y: 0., z: 0. }
-    }
-
 }
-       
-/// 2- and 3-dimensional GS
-pub trait Coord {}
-impl Coord for TwoD {}
-impl Coord for ThreeD {}
 
-/// T is a 2 or 3-element array of f64 defining
+/// For the numerical integration
+type Position     = Coord;
+type Velocity     = Coord;
+type Acceleration = Coord;
+
 /// the coordinates of the star.
 #[derive(Debug)]
 #[derive(Serialize, Deserialize)]
-pub struct Star<T: Coord> {
+pub struct Star {
     mass: f64,
-    coordinate: T
+    coordinate: Coord
 }
 
-impl <T: Coord> Star<T> {
-    pub fn new(mass: f64, coord: T) -> Star<T> {
-        Star::<T> { mass: mass,
-                    coordinate: coord }
+impl Star {
+    pub fn new(mass: f64, coord: Coord) -> Star {
+        Star { mass: mass,
+               coordinate: coord }
     }
 }
 
 #[test]
 fn star_is_working() {
-    let s = Star::<ThreeD> { mass: 100.0,
-                             coordinate: ThreeD {x: 1.1, y: 2.2, z: 3.3}};
+    let s = Star { mass: 100.0,
+                   coordinate: Coord.new(1.1, 2.2, 3.3) };
 }
 
 /// Total description of the
 /// gravitational system.
 #[derive(Debug)]
 #[derive(Serialize, Deserialize)]
-pub struct GSystem<T: Coord> {
-    stars: Vec<Star<T>>,
+pub struct GSystem {
+    stars: Vec<Star>,
     asize: u32,
     delta: f64,
     max_iter: u32,
-    lcorner: T,
-    ucorner: T
+    lcorner: Coord,
+    ucorner: Coord
 }
 
-impl <T: Coord> GSystem<T> {
-    pub fn new(stars: Vec<Star<T>>,
+impl GSystem {
+    pub fn new(stars: Vec<Star>,
                msize: u32,
                delta: f64,
                miter: u32,
-               upper: T,
-               lower: T) -> GSystem<T> {
-        GSystem::<T> { stars: stars,
-                       asize: 2u32.pow(msize),
-                       delta: delta,
-                       max_iter: miter,
-                       lcorner: lower,
-                       ucorner: upper }
+               upper: Coord,
+               lower: Coord) -> GSystem {
+        GSystem { stars: stars,
+                  asize: 2u32.pow(msize),
+                  delta: delta,
+                  max_iter: miter,
+                  lcorner: lower,
+                  ucorner: upper }
     }
     
     /// This iterates for a single point
-    pub fn iterate(initial: T) -> u32 {
+    pub fn iterate(initial: Position) -> u32 {
         0
     }
 
-    fn center_of_mass(&self) -> T {
+    fn center_of_mass(&self) -> Coord {
         let mut total_mass: f64 = 0.0;
-        let mut saccum: T = T.zeros();
+        let mut saccum: Coord = Coord.zeros();
         for star in &self.stars {
             total_mass += star.mass;
-            
         }
         saccum
     }
 }
 
-type GSystem2 = GSystem<TwoD>;
-type GSystem3 = GSystem<ThreeD>;
- 
 #[test]
 fn gsystem_is_working() {
-    type S = Star<ThreeD>;
+    type S = Star;
     let mut vs = Vec::<S>::new();
     vs.push(S::new(1.0, [2.0, 3.1, -1.0]));
     println!("vec: {:?}", vs);
-    let gs = GSystem3::new(vs,
-                           8,
-                           0.1,
-                           256,
-                           [0.,0.,0.],
-                           [1.,1.,1.]);
+    let gs = GSystem::new(vs,
+                          8,
+                          0.1,
+                          256,
+                          [0.,0.,0.],
+                          [1.,1.,1.]);
     assert_eq!(gs.max_iter, 256);
 }
 
-// Run 2D
+// Run
 #[no_mangle]
-pub extern fn run_gs2(json: &str) -> Result<GSystem2, Error> {
-    let gs: GSystem2 = from_str(json)?;
+pub extern fn run_gs(json: &str) -> Result<GSystem, Error> {
+    let gs: GSystem = from_str(json)?;
     Ok(gs)
 }
-
-// Run 3D
-#[no_mangle]
-pub extern fn run_gs3(json: &str) -> Result<GSystem3, Error> {
-    let gs: GSystem3 = from_str(json)?;
-    Ok(gs)
-}   
