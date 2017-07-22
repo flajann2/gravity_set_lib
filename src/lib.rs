@@ -16,6 +16,8 @@ mod compute;
 
 
 /// Mainly for the fixed coordinates of the Stars
+#[derive(Debug)]
+#[derive(Serialize, Deserialize)]
 pub struct Coord {
     x: f64,
     y: f64,
@@ -23,7 +25,7 @@ pub struct Coord {
 }
 
 impl Coord {
-    fn zeros() -> Coord {
+    pub fn zeros() -> Coord {
         Coord {x: 0.0, y: 0.0, z: 0.0}
     }
 }
@@ -51,7 +53,7 @@ impl Star {
 #[test]
 fn star_is_working() {
     let s = Star { mass: 100.0,
-                   coordinate: Coord.new(1.1, 2.2, 3.3) };
+                   coordinate: Coord{x: 1.1, y: 2.2, z: 3.3} };
 }
 
 /// Total description of the
@@ -81,7 +83,7 @@ impl GSystem {
                   lcorner: lower,
                   ucorner: upper }
     }
-    
+
     /// This iterates for a single point
     pub fn iterate(initial: Position) -> u32 {
         0
@@ -89,7 +91,7 @@ impl GSystem {
 
     fn center_of_mass(&self) -> Coord {
         let mut total_mass: f64 = 0.0;
-        let mut saccum: Coord = Coord.zeros();
+        let mut saccum: Coord = Coord::zeros();
         for star in &self.stars {
             total_mass += star.mass;
         }
@@ -101,14 +103,14 @@ impl GSystem {
 fn gsystem_is_working() {
     type S = Star;
     let mut vs = Vec::<S>::new();
-    vs.push(S::new(1.0, [2.0, 3.1, -1.0]));
+    vs.push(S::new(1.0, Coord{x: 2.0, y: 3.1, z: -1.0}));
     println!("vec: {:?}", vs);
     let gs = GSystem::new(vs,
                           8,
                           0.1,
                           256,
-                          [0.,0.,0.],
-                          [1.,1.,1.]);
+                          Coord{x: 0., y: 0., z: 0.},
+                          Coord{x: 1., y: 1., z: 1.});
     assert_eq!(gs.max_iter, 256);
 }
 
