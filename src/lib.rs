@@ -35,25 +35,28 @@ type Position     = Coord;
 type Velocity     = Coord;
 type Acceleration = Coord;
 
+/// For indexing
+type Idx = usize;
+
 /// the coordinates of the star.
 #[derive(Debug)]
 #[derive(Serialize, Deserialize)]
 pub struct Star {
     mass: f64,
-    coordinate: Coord
+    position: Position
 }
 
 impl Star {
-    pub fn new(mass: f64, coord: Coord) -> Star {
+    pub fn new(mass: f64, pos: Position) -> Star {
         Star { mass: mass,
-               coordinate: coord }
+               position: pos }
     }
 }
 
 #[test]
 fn star_is_working() {
     let s = Star { mass: 100.0,
-                   coordinate: Coord{x: 1.1, y: 2.2, z: 3.3} };
+                   position: Position{x: 1.1, y: 2.2, z: 3.3} };
 }
 
 /// Total description of the
@@ -65,8 +68,10 @@ pub struct GSystem {
     asize: u32,
     delta: f64,
     max_iter: u32,
-    lcorner: Coord,
-    ucorner: Coord
+    lcorner: Position,
+    ucorner: Position,
+    initial_velocity: Velocity,
+    initial_acceleration: Acceleration
 }
 
 impl GSystem {
@@ -74,14 +79,16 @@ impl GSystem {
                msize: u32,
                delta: f64,
                miter: u32,
-               upper: Coord,
-               lower: Coord) -> GSystem {
+               upper: Position,
+               lower: Position) -> GSystem {
         GSystem { stars: stars,
                   asize: 2u32.pow(msize),
                   delta: delta,
                   max_iter: miter,
                   lcorner: lower,
-                  ucorner: upper }
+                  ucorner: upper,
+                  initial_velocity: Velocity::zeros(),
+                  initial_acceleration: Acceleration::zeros() }
     }
 
     /// This iterates for a single point
@@ -103,14 +110,14 @@ impl GSystem {
 fn gsystem_is_working() {
     type S = Star;
     let mut vs = Vec::<S>::new();
-    vs.push(S::new(1.0, Coord{x: 2.0, y: 3.1, z: -1.0}));
+    vs.push(S::new(1.0, Position{x: 2.0, y: 3.1, z: -1.0}));
     println!("vec: {:?}", vs);
     let gs = GSystem::new(vs,
                           8,
                           0.1,
                           256,
-                          Coord{x: 0., y: 0., z: 0.},
-                          Coord{x: 1., y: 1., z: 1.});
+                          Position{x: 0., y: 0., z: 0.},
+                          Position{x: 1., y: 1., z: 1.});
     assert_eq!(gs.max_iter, 256);
 }
 
