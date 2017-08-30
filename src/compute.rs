@@ -3,7 +3,6 @@ extern crate num_traits;
 
 use ::{Star, GSystem, Position, Velocity, Acceleration, Idx};
 use std::vec::Vec;
-//use std::num;
 use std::ops::{Index, IndexMut};
 use self::num_traits::pow;
 

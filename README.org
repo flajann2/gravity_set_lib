@@ -9,6 +9,12 @@
 ** Synopsis
    This library generates the Gravity Set,
 ** Background
+   Please see:
+
+   https://mitchell-gravity-set.quora.com/
+
+   for the mathematical background behind MGS.
+
 *** Motivation
     The original MGS was implemented as a 2D gravity field.
     As well, at the time, the computing power of the computers

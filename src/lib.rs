@@ -96,6 +96,10 @@ impl GSystem {
         0
     }
 
+    /// Calculate the acceleration vector acting on the Free Point Mass
+    fn acceleration(fpm: Position) -> Acceleration {
+    }
+
     fn center_of_mass(&self) -> Coord {
         let mut total_mass: f64 = 0.0;
         let mut saccum: Coord = Coord::zeros();
