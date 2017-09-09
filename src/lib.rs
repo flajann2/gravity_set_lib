@@ -11,29 +11,70 @@ use serde_json::{from_str, Error};
 use std::thread;
 use std::result::Result;
 use ndarray::{Array, Array2, Array3, Dim};
+use std::ops::{Add, Mul, Div};
 
 mod compute;
 
+/// Defines the dimensionality
+const PLY: usize = 3;
 
-/// Mainly for the fixed coordinates of the Stars
+
+/// Represents all the scalar values
 #[derive(Debug)]
 #[derive(Serialize, Deserialize)]
-pub struct Coord {
-    x: f64,
-    y: f64,
-    z: f64
-}
+pub struct Scalar{ value: f64 }
 
-impl Coord {
-    pub fn zeros() -> Coord {
-        Coord {x: 0.0, y: 0.0, z: 0.0}
+/// Vector represents all position, acceleration and velocity vectors
+#[derive(Debug)]
+#[derive(Serialize, Deserialize)]
+pub struct Vector{ value: Vec<f64> }
+
+
+impl Vector {
+    fn zeros() -> Self {
+        Vector{value: vec![0.0; PLY]}
     }
 }
 
+impl Add for Scalar {
+    type Output = Self;
+
+    fn add(self, other: Scalar) -> Self {
+        Scalar{value: self.value + other.value}
+    }
+}
+
+impl Add for Vector {
+    type Output = Self;
+
+    fn add(self, other: Vector) -> Self {
+        Vector{ value: other.value.iter().zip(self.value.iter()).map(|(&p, &q)| p + q).collect() }
+    }
+}
+
+impl Mul<Vector> for Scalar {
+    type Output = Vector;
+
+    fn mul(self, rhs: Vector) -> Vector {
+        Vector{value: rhs.value.iter().map(|v| self.value * v).collect() }
+    }
+}
+
+impl Div<Vector> for Scalar {
+    type Output = Vector;
+
+    fn div(self, rhs: Vector) -> Vector {
+        Vector{value: rhs.value.iter().map(|v| self.value / v).collect() }
+    }
+}
+
+/// And for all the unsigned integers in our life
+type UInt = u32;
+
 /// For the numerical integration
-type Position     = Coord;
-type Velocity     = Coord;
-type Acceleration = Coord;
+type Position     = Vector;
+type Velocity     = Vector;
+type Acceleration = Vector;
 
 /// For indexing
 type Idx = usize;
@@ -42,13 +83,13 @@ type Idx = usize;
 #[derive(Debug)]
 #[derive(Serialize, Deserialize)]
 pub struct Star {
-    mass: f64,
+    mass: Scalar,
     position: Position
 }
 
 impl Star {
     pub fn new(mass: f64, pos: Position) -> Star {
-        Star { mass: mass,
+        Star { mass: Scalar{value: mass},
                position: pos }
     }
 }
@@ -66,7 +107,7 @@ fn star_is_working() {
 pub struct GSystem {
     stars: Vec<Star>,
     asize: u32,
-    delta: f64,
+    delta: Scalar,
     max_iter: u32,
     lcorner: Position,
     ucorner: Position,
@@ -76,14 +117,14 @@ pub struct GSystem {
 
 impl GSystem {
     pub fn new(stars: Vec<Star>,
-               msize: u32,
+               msize: UInt,
                delta: f64,
-               miter: u32,
+               miter: UInt,
                upper: Position,
                lower: Position) -> GSystem {
         GSystem { stars: stars,
                   asize: 2u32.pow(msize),
-                  delta: delta,
+                  delta: Scalar{value: delta},
                   max_iter: miter,
                   lcorner: lower,
                   ucorner: upper,
@@ -92,21 +133,33 @@ impl GSystem {
     }
 
     /// This iterates for a single point
-    pub fn iterate(initial: Position) -> u32 {
+    pub fn iterate(&self, initial: Position) -> u32 {
         0
     }
 
     /// Calculate the acceleration vector acting on the Free Point Mass
-    fn acceleration(fpm: Position) -> Acceleration {
+    fn acceleration(&self, fpm: Position) -> Acceleration {
+        Vector::zeros()
     }
 
-    fn center_of_mass(&self) -> Coord {
-        let mut total_mass: f64 = 0.0;
-        let mut saccum: Coord = Coord::zeros();
+    /// Calculate the velocity i given velocity i-1 and acceleration
+    fn velocity(&self, a: Acceleration, pv: Velocity) -> Velocity {
+        Velocity::zeros()
+    }
+
+    /// Calculate the position i given position i-1 and velocity.
+    fn position(&self, v: Velocity, pp: Position) -> Position {
+        pp
+    }
+
+    fn center_of_mass(&self) -> Vector {
+        let mut total_mass: Scalar = Scalar{value: 0.0};
+        let mut saccum: Position = Position::zeros();
         for star in &self.stars {
             total_mass += star.mass;
+            saccum += star.pos * star.mass;
         }
-        saccum
+        saccum / total_mass
     }
 }
 

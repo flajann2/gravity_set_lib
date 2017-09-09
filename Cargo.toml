@@ -11,6 +11,7 @@ ndarray = "0.9"
 num = "0"
 num-traits = "0.1"
 num_cpus = "1"
+rayon = "0.8"
 
 [lib]
 name = "gravityset"
