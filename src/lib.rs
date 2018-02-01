@@ -96,7 +96,7 @@ impl Star {
 
 #[test]
 fn star_is_working() {
-    let s = Star { mass: 100.0,
+    let s = Star { mass: Scalar{value: 100.0},
                    position: Position{x: 1.1, y: 2.2, z: 3.3} };
 }
 
